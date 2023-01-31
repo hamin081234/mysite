@@ -4,6 +4,8 @@ from bs4 import BeautifulSoup
 import requests
 import time
 from datetime import date
+import random
+
 
 class Crawler:
 
@@ -37,9 +39,10 @@ class Crawler:
                 product_cd = product.get("data-product-cd")
                 url = "https://www.iloom.com/product/detail.do?productCd="+product_cd
                 product_detail = self.parse_html(url)
-                self.product_info_parse(product_detail)
+                const = {"product_cd":product_cd}
+                self.product_info_parse(product_detail, const)
 
-    def product_info_parse(self, product_detail):
+    def product_info_parse(self, product_detail, const):
 
         # 상품 상세 정보 박스 --------------------------------
         box_product_info = product_detail.select_one("div.box_productInfo")
@@ -64,7 +67,10 @@ class Crawler:
         img_src_list = box_product_gal.select("li>img")
         img_url_list = []
         for img_src in img_src_list:
-            file_name = "a"
+            file_num = str(random.randint(1,100000))
+            while len(file_num) < 5:
+                file_num = "0"+file_num
+            file_name = const["product_cd"]+"_"+file_num+"_"+str(round(time.time()))+".png"
             img_url = img_src.get("src")
             if img_url:
                 # img_url_list.append(img_url)
