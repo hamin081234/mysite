@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% load static %} <!--css, js, images 로딩 최상단에 위치!-->
+    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
+    <!--  Bootstrap  -->
+    <link rel="stylesheet" type="text/css" href="{% static 'bootstrap.min.css' %}">
+    <title>Title</title>
+</head>
+<body>
+<!-- container start -->
+<main class="container">
+    <!-- 제목 -->
+    <div class="text-start m-5">
+        <h2>질문 목록</h2>
+    </div>
+    <!-- 제목 end -->
+
+    <div class="d-grid gap-2 d-md-flex justify-content-end">
+        <input type="button" class="btn btn-outline-secondary btn-sm" value="조회">
+        <a href="#" class="btn btn-outline-primary btn-sm">등록</a>
+    </div>
+
+    <!-- 검색, 버튼 -->
+    <div class="d-grid gap-2 d-md-flex justify-content-end mb-3">
+        <form action="#" class="text-end input-group">
+            <div class="col-sm-2 col-md-2 col-lg-2">
+                <select class="form-select" aria-label="Default select example">
+                    <option selected>전체</option>
+                    <option value="10">제목</option>
+                    <option value="20">내용</option>
+                    <option value="30">작성자</option>
+                </select>
+            </div>
+            <div class="col-sm-6 col-md-6 col-lg-6">
+                <input type="text" class="form-control flex-2" placeholder="검색어 입력...">
+            </div>
+            <div class="col-sm-2 col-md-2 col-lg-2">
+                <select class="form-select flex-1" aria-label="Default select example">
+                    <option selected>전체</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="30">30</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </div>
+        </form>
+    </div>
+    <!-- 검색, 버튼 end -->
+    <table class="table table-striped table-hover table-bordered">
+        <thead>
+        <tr class="table-dark">
+            <th scope="col" class="text-center">No.</th>
+            <th scope="col" class="text-center">제목</th>
+            <th scope="col" class="text-center">작성일</th>
+            <th scope="col" class="text-center">조회수</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for question in question_list %}
+        <tr>
+            <td scope="col" class="text-center">{{question.id}}</td>
+            <td scope="col" class="text-start">
+                <a href="{% url 'pybo:detail' question.id %}">
+                    {{question.subject}}
+                </a>
+            </td>
+            <td scope="col" class="text-center">{{question.create_date|date:"Y-m-d"}}</td>
+            <td scope="col" class="text-end">question.views</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</main>
+<!-- table end -->
+<!-- paging -->
+<div class="d-flex justify-content-center">
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+            <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+            <li class="page-item"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item"><a class="page-link" href="#">Next</a></li>
+        </ul>
+    </nav>
+</div>
+<!-- paging end -->
+<!-- container end-->
+</body>
+</html>

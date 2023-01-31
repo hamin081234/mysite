@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% load static %} <!--css, js, images 로딩 최상단에 위치!-->
+    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
+    <!--  Bootstrap  -->
+    <link rel="stylesheet" type="text/css" href="{% static 'bootstrap.min.css' %}">
+    <script defer>
+        function doSave() {
+            let form = document.forms["answer"]
+            let content = form.content.value;
+            console.log("content"+content)
+            if(isEmpty(content)){
+                alert("내용을 입력하세요");
+                form.content.focus();
+                return;
+            }
+        }
+    </script>
+    <title>Title</title>
+</head>
+<body>
+    {% if question %}
+        <p> 제목 : {{question.subject}}</p>
+        <p> 작성일 : {{question.create_date|date:"Y년 m월 d일"}}</p>
+        <p> 내용 : {{question.content}}</p>
+    {% else %}
+        <p> 데이터가 소실 되었습니다 </p>
+    {% endif %}
+
+    <form name="answer" action="{% url 'pybo:answer_create' question.id %}" method="post">
+        {% csrf_token %}
+        <textarea name = "content" id="content" rows="15"></textarea>
+        <input type="submit" value="답변등록">
+    </form>
+    <h3>답변: {{question.answer_set.count}}</h3>
+    <div>
+        <ul>
+            {% for answer in question.answer_set.all %}
+                <li>{{answer.content}}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+</body>
+</html>

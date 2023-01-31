@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% load static %} <!--css, js, images 로딩 최상단에 위치!-->
+    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
+    <!--  Bootstrap  -->
+    <link rel="stylesheet" type="text/css" href="{% static 'bootstrap.min.css' %}">
+    <title>Title</title>
+</head>
+<body>
+    <ul class="list-group">
+        {# 한 줄 코멘트 #}
+        <!--
+            HTML 코멘트
+            {와 % 사이에는 빈공간이 없어야 한다. {% (O), { % (X)
+        -->
+        {% comment %}
+            <div>
+                <p>불필요 블럭</p>
+            </div>
+        {% endcomment %}
+        {% if question_list %}
+            {% for question in question_list %}
+                {# http://http://127.0.0.1:8000/pybo/1 #}
+                <li class="list-group-item">
+                    {{forloop.counter}},
+                    {{forloop.counter0}},
+                    <a href="{% url 'pybo:detail' question.id %}">{{question.subject}}</a>,
+                    {{question.create_date|date:"Y-m-d"}}
+                </li>
+            {% endfor %}
+        {% else  %}
+            <p> 질문이 없습니다 </p>
+        {% endif %}
+    </ul>
+    {% csrf_token %}
+</body>
+</html>
