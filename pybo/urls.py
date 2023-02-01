@@ -16,7 +16,7 @@ urlpatterns =[
     path('', views.index, name="index"),
     path('<int:question_id>/', views.detail, name="detail"),
     #temp menu
-    path("boot/menu/", views.boot_menu, name="boot_menu"),
+    # path("boot/menu/", views.boot_menu, name="boot_menu"),
     #bootstrap template
     path('register/', views.register, name="register"),
     path('answer/create/<int:question_id>/', views.answer_create, name="answer_create"),

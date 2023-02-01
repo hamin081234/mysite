@@ -1,14 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    {% load static %} <!--css, js, images 로딩 최상단에 위치!-->
-    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
-    <!--  Bootstrap  -->
-    <link rel="stylesheet" type="text/css" href="{% static 'bootstrap.min.css' %}">
-    <title>Title</title>
-</head>
-<body>
+{% extends "./base.html" %}
+{% block content%}
 <!-- container start -->
 <main class="container">
     <!-- 제목 -->
@@ -94,5 +85,4 @@
 </div>
 <!-- paging end -->
 <!-- container end-->
-</body>
-</html>
+{% endblock %}

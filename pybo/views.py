@@ -4,11 +4,12 @@ from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 
 from pybo.models import Question, Answer
+from pybo.forms import QuestionForm
 
 
 # Create your views here.
-def boot_menu(request):
-    return render()
+# def boot_menu(request):
+#     return render()
 
 
 def answer_create(request, question_id):
@@ -21,7 +22,31 @@ def answer_create(request, question_id):
 
 
 def register(request):
-    return render(request, "pybo/question_register.html")
+    """ 질문 등록 """
+
+    print('request.method : {}'.format(request.method))
+    form = None
+    if request.method == "POST":
+        print("question_create post")
+        # 저장
+        form = QuestionForm(request.POST)  # request.POST 데이터 (그냥 request는 GET이 default)
+        if form.is_valid():  # form(질문 등록)이 유용하면
+            question = form.save(commit=False)  # subject와 content만 저장 (DB에 물리적으로 commit은 하지 않음)
+            question.create_date = timezone.now()
+            question.save()  # 날짜까지 생성해서 저장 (commit)
+            return redirect("pybo:detail", question_id=question.id)
+    else:
+        form = QuestionForm()
+    return render(request, 'pybo/question_form.html', {'form': form})
+
+
+# def question_create(request):
+#     question = Question(subject=request.POST.get("subject"),
+#                         content=request.POST.get("content"),
+#                         create_date=timezone.now())
+#     question.save()
+#     return redirect('pybo:detail', question_id=question.id)
+
 
 
 def detail(request, question_id):

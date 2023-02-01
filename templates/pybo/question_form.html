@@ -1,0 +1,15 @@
+{% extends './base.html' %}
+{% block content %}
+<main class="container">
+    <div class="text-start mb-5">
+        <h2>질문 등록</h2>
+    </div>
+
+    <form action="{% url 'pybo:register' %}" method="post" class="">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-outline-primary btn-sm">제출</button>
+    </form>
+
+</main>
+{% endblock %}
