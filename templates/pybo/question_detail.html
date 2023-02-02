@@ -4,14 +4,33 @@
     {% if question %}
     <p> 제목 : {{question.subject}}</p>
     <p> 작성일 : {{question.create_date|date:"Y년 m월 d일"}}</p>
-    <p> 내용 : {{question.content}}</p>
+    <div> 내용 :
+        <p>
+            {{question.content}}
+        </p>
+    </div>
     {% else %}
     <p> 데이터가 소실 되었습니다 </p>
     {% endif %}
 
     <form name="answer" action="{% url 'pybo:answer_create' question.id %}" method="post">
         {% csrf_token %}
-        <textarea name="content" id="content" rows="15"></textarea>
+        <!-- form validation 기능 end -->
+        {% if form.errors %}
+        <div class="alert alert-danger" role="alert">
+            {% for field in form %}
+                {% if field.errors %}
+                    <div>
+                        <strong>{{field.label}}</strong>
+                    </div>
+                    {{field.errors}}
+                {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+        <!-- form validation 기능 end -->
+
+        <textarea name="content" id="content" rows="15">{{ form.content.value|default_if_none:'' }}</textarea>
         <input type="submit" value="답변등록">
     </form>
     <h3>답변: {{question.answer_set.count}}</h3>

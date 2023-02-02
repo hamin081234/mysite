@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="viewport" content="content=" width=device-width, initial-scale=1, shrink-to-fit=no">
 
     {% load static %} <!--css, js, images 로딩 최상단에 위치!-->
     <!-- favicon -->
@@ -11,10 +11,12 @@
     <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
     <!--  Bootstrap  -->
     <link rel="stylesheet" type="text/css" href="{% static 'bootstrap.min.css' %}">
+    <script src="{% static 'bootstrap.min.js' %}" defer></script>
 
     <title>Title</title>
 </head>
 <body>
+{% include './navbar.html' %}
 {% block content %}
 {% endblock %}
 </body>

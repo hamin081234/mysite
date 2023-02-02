@@ -7,7 +7,38 @@
 
     <form action="{% url 'pybo:register' %}" method="post" class="">
         {% csrf_token %}
-        {{ form.as_p }}
+        <!-- form validation 기능 -->
+        {% if form.errors %}
+        <div class="alert alert-danger" role="alert">
+            {% for field in form %}
+                {% if field.errors %}
+                    <div>
+                        <strong>{{field.label}}</strong>
+                    </div>
+                    {{field.errors}}
+                {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+        <!-- form validation 기능 end -->
+
+        <div class="mb-3">
+            <label for="subject" class="col-form-label">제목</label>
+            <div>
+                <!--템플릿 필터-->
+                <input type="text" class="form-control" id="subject" name="subject"
+                       value="{{ form.subject.value|default_if_none:'' }}"
+                >
+            </div>
+        </div>
+        <div class="mb-3">
+            <label for="content" class="col-form-label">내용</label>
+            <div class="">
+                <!-- content에 데이터가 없으면 None이라는 문자열이 표시 됨, None 대신 공백으로 표시하세요. -->
+                <textarea name="content" id="content" rows="10" class="form-control">{{ form.content.value|default_if_none:'' }}</textarea>
+            </div>
+        </div>
+
         <button type="submit" class="btn btn-outline-primary btn-sm">제출</button>
     </form>
 
