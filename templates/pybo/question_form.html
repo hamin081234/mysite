@@ -1,4 +1,4 @@
-{% extends './base.html' %}
+{% extends '../base.html' %}
 {% block content %}
 <main class="container">
     <div class="text-start mb-5">
@@ -8,19 +8,7 @@
     <form action="{% url 'pybo:register' %}" method="post" class="">
         {% csrf_token %}
         <!-- form validation 기능 -->
-        {% if form.errors %}
-        <div class="alert alert-danger" role="alert">
-            {% for field in form %}
-                {% if field.errors %}
-                    <div>
-                        <strong>{{field.label}}</strong>
-                    </div>
-                    {{field.errors}}
-                {% endif %}
-            {% endfor %}
-        </div>
-        {% endif %}
-        <!-- form validation 기능 end -->
+        {% include "form_errors.html" %}
 
         <div class="mb-3">
             <label for="subject" class="col-form-label">제목</label>

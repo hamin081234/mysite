@@ -7,7 +7,7 @@ since 2023.01.09 Copyright (C) by Hamin All right reserved.
 """
 from unittest import TestCase
 
-from pybo.crawler import Crawler
+# from pybo.crawler import Crawler
 
 
 def main():
@@ -24,8 +24,10 @@ class TestCrawler(TestCase):
     def test_find_product_list(self):
         self.fail()
 
-    def test_product_info_parse(self):
-        crawler = Crawler()
-        url = "https://www.iloom.com/product/detail.do?productCd=HB722501"
-        product_detail = crawler.parse_html(url)
-        crawler.product_info_parse(product_detail)
+    def test_zip(self):
+        integers = [1, 2, 3]
+        letters = ['a', 'b', 'c']
+        floats = [4.0, 8.0, 10.0]
+        zipped = zip(integers, letters, floats)
+        list_data = list(zipped)
+        print('list_data:{}'.format(list_data))

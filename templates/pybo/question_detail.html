@@ -1,4 +1,4 @@
-{% extends "./base.html" %}
+{% extends "../base.html" %}
 {% block content %}
 <main class="container">
     {% if question %}
@@ -16,22 +16,11 @@
     <form name="answer" action="{% url 'pybo:answer_create' question.id %}" method="post">
         {% csrf_token %}
         <!-- form validation 기능 end -->
-        {% if form.errors %}
-        <div class="alert alert-danger" role="alert">
-            {% for field in form %}
-                {% if field.errors %}
-                    <div>
-                        <strong>{{field.label}}</strong>
-                    </div>
-                    {{field.errors}}
-                {% endif %}
-            {% endfor %}
-        </div>
-        {% endif %}
+        {% include "form_errors.html" %}
         <!-- form validation 기능 end -->
 
         <textarea name="content" id="content" rows="15">{{ form.content.value|default_if_none:'' }}</textarea>
-        <input type="submit" value="답변등록">
+        <input type="submit" value="답변등록" name="submit_answer">
     </form>
     <h3>답변: {{question.answer_set.count}}</h3>
     <div>
