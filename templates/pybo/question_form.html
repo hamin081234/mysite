@@ -5,7 +5,7 @@
         <h2>질문 등록</h2>
     </div>
 
-    <form action="{% url 'pybo:register' %}" method="post" class="">
+    <form action="" method="post" class="">
         {% csrf_token %}
         <!-- form validation 기능 -->
         {% include "form_errors.html" %}

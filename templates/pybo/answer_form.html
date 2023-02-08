@@ -1,0 +1,15 @@
+{% extends '../base.html' %}
+{% block content %}
+<main class="container">
+    <form name="answer" action="" method="post" class="form-control">
+        {% csrf_token %}
+        <!-- form validation 기능 end -->
+        {% include "form_errors.html" %}
+        <!-- form validation 기능 end -->
+
+        <textarea name="content" id="content" rows="5"
+                  class="form-control">{{ form.content.value|default_if_none:'' }}</textarea>
+        <input type="submit" value="답변등록" name="submit_answer" class="form-control">
+    </form>
+</main>
+{% endblock %}

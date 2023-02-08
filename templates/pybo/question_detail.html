@@ -2,33 +2,77 @@
 {% block content %}
 <main class="container">
     {% if question %}
-    <p> 제목 : {{question.subject}}</p>
-    <p> 작성일 : {{question.create_date|date:"Y년 m월 d일"}}</p>
+    <!-- message 표시 -->
+    {% if messages %}
+    <div class="alert alert-danger" role="alert">
+        {% for message in messages %}
+        <strong>{{message.tags}}</strong>
+        <ul>
+            <li>{{message.message}}</li>
+        </ul>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <!-- message 표시 end -->
+    <h1>{{question.subject}}</h1>
+    <strong class="d-flex justify-content-end">{{question.author.username}}</strong>
+    <p>{{question.create_date|date:"Y년 m월 d일"}}</p>
     <div> 내용 :
         <p>
             {{question.content}}
         </p>
     </div>
-    {% else %}
-    <p> 데이터가 소실 되었습니다 </p>
+    <!-- 질문 수정 -->
+    {% if request.user != None and question.author == request.user %}
+    <div class="my-3">
+        <a href="{% url 'pybo:question_modify' question.id %}" class="modify btn btn-outline-primary">수정</a>
+        <a href="{% url 'pybo:question_delete' question.id %}" class="delete btn btn-outline-danger">삭제</a>
+<!--        <a href="javascript:void(0);" data-url="{% url 'pybo:question_delete' question.id %}"  -->
+<!--           class="delete btn btn-outline-danger">삭제</a>-->
+    </div>
     {% endif %}
 
-    <form name="answer" action="{% url 'pybo:answer_create' question.id %}" method="post">
+    <form name="answer" action="{% url 'pybo:answer_create' question.id %}" method="post" class="form-control">
         {% csrf_token %}
         <!-- form validation 기능 end -->
         {% include "form_errors.html" %}
         <!-- form validation 기능 end -->
 
-        <textarea name="content" id="content" rows="15">{{ form.content.value|default_if_none:'' }}</textarea>
-        <input type="submit" value="답변등록" name="submit_answer">
+        <textarea name="content" id="content" rows="5" class="form-control">{{ form.content.value|default_if_none:'' }}</textarea>
+        <input type="submit" value="답변등록" name="submit_answer" class="form-control">
     </form>
     <h3>답변: {{question.answer_set.count}}</h3>
     <div>
         <ul>
             {% for answer in question.answer_set.all %}
-            <li>{{answer.content}}</li>
+            <li>
+                <strong>{{answer.author.username}}</strong>  <!-- 글쓴이 -->
+                <p>
+                    {{answer.content}}
+                </p>
+                {% if request.user != None and answer.author == request.user %}
+                <a href="{% url 'pybo:answer_modify' answer.id %}" class="btn btn-outline-primary">수정</a>
+                <a href="{% url 'pybo:answer_delete' answer.id %}" class="btn btn-outline-danger">삭제</a>
+                {% endif %}
+            </li>
             {% endfor %}
         </ul>
     </div>
+    {% else %}
+    <p> 데이터가 소실 되었습니다 </p>
+    {% endif %}
 </main>
+{% endblock %}
+{% block script %}
+<script>
+    const deleteBtn = document.querySelector(".delete")
+    deleteBtn.addEventListener('click', function(e){
+        if(confirm('삭제 하시겠습니까?')){
+            console.log("delete")
+            location.href = this.dataset["url"]
+        } else {
+            e.preventDefault()
+        }
+    });
+</script>
 {% endblock %}

@@ -15,9 +15,17 @@ app_name = 'pybo'
 urlpatterns =[
     path('', views.index, name="index"),
     path('<int:question_id>/', views.detail, name="detail"),
-    #temp menu
+
+    # temp menu
     # path("boot/menu/", views.boot_menu, name="boot_menu"),
-    #bootstrap template
-    path('register/', views.register, name="register"),
+
+    # answer
     path('answer/create/<int:question_id>/', views.answer_create, name="answer_create"),
+    path('answer/delete/<int:answer_id>/', views.answer_delete, name="answer_delete"),
+    path('answer/modify/<int:answer_id>/', views.answer_modify, name="answer_modify"),
+
+    # question
+    path('register/', views.register, name="register"),
+    path('question/modify/<int:question_id>/', views.modify_question, name="question_modify"),
+    path('question/delete/<int:question_id>/', views.delete_question, name="question_delete"),
 ]

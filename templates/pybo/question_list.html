@@ -44,9 +44,10 @@
         <thead>
         <tr class="table-dark">
             <th scope="col" class="text-center">No.</th>
-            <th scope="col" class="text-center">제목</th>
+            <th scope="col" class="text-center" style="width: 50%;">제목</th>
             <th scope="col" class="text-center">작성일</th>
             <th scope="col" class="text-center">조회수</th>
+            <th scope="col" class="text-center">작성자</th>
         </tr>
         </thead>
         <tbody>
@@ -64,6 +65,7 @@
             </td>
             <td scope="col" class="text-center">{{question.create_date|date:"Y-m-d"}}</td>
             <td scope="col" class="text-end">question.views</td>
+            <td scope="col" class="text-end">{{question.author}}</td>
         </tr>
         {% endfor %}
         {% else %}

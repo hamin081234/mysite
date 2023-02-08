@@ -6,13 +6,52 @@ from django.shortcuts import render, get_object_or_404, redirect
 from pybo.models import Question, Answer
 from pybo.forms import QuestionForm, AnswerForm
 import logging
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 
 # Create your views here.
 # def boot_menu(request):
 #     return render()
 
+@login_required(login_url='common:login')
+def answer_delete(request, answer_id):
+    logging.info('answer_delete에 잘 들어왔다')
 
+    answer = get_object_or_404(Answer, pk=answer_id)
+
+    if answer.author.username != request.user.username:
+        messages.error(request, "권한이 없습니다.")
+        return redirect('pybo:detail', question_id=answer.question.pk)
+
+    answer.delete()
+    return redirect('pybo:detail', question_id=answer.question.pk)
+
+@login_required(login_url='common:login')
+def answer_modify(request, answer_id):
+    logging.info("answer_modify에 잘 들어왔다")
+
+    answer = get_object_or_404(Answer, pk=answer_id)
+
+    if answer.author.username != request.user.username:
+        messages.error(request, "권한이 없습니다.")
+        return redirect('pybo:detail', question_id=answer.question.pk)
+
+    if request.method == 'POST':
+        form = AnswerForm(request.POST, instance=answer)
+        if form.is_valid():
+            answer = form.save(commit=False)
+            answer.create_date = timezone.now()
+
+            answer.save()
+            return redirect('pybo:detail', question_id=answer.question.pk)
+
+    form = AnswerForm(instance=answer)
+    context = {'form': form, 'question': answer.question}
+    return render(request, 'pybo/answer_form.html', context)
+
+
+@login_required(login_url='common:login')
 def answer_create(request, question_id):
     logging.info("answer_create question_id:{}".format(question_id))
     question = get_object_or_404(Question, pk=question_id)
@@ -24,15 +63,16 @@ def answer_create(request, question_id):
             answer = form.save(commit=False)
             answer.create_date = timezone.now()
             answer.question = question
+            answer.author = request.user
+
             answer.save()  # 최종 저장
             return redirect('pybo:detail', question_id=question.id)
-    else:
-        return HttpResponseNotAllowed("Post만 가능 합니다.")
 
     context = {'question': question, 'form': form}
     return render(request, 'pybo/question_detail.html', context)
 
 
+@login_required(login_url='common:login')  # 로그인이 되어있지 않으면 login 페이지로 이동
 def register(request):
     """ 질문 등록 """
 
@@ -45,12 +85,51 @@ def register(request):
         if form.is_valid():  # form(질문 등록)이 유용하면
             question = form.save(commit=False)  # subject와 content만 저장 (DB에 물리적으로 commit은 하지 않음)
             question.create_date = timezone.now()
+            question.author = request.user  # author 속성에 로그인 계정 저장
+
+            logging.info('4. question.author: {}'.format(question.author))
+
             question.save()  # 날짜까지 생성해서 저장 (commit)
             return redirect("pybo:detail", question_id=question.id)
     else:
         form = QuestionForm()
-    return render(request, 'pybo/question_form.html', {'form': form})
+    context = {'form': form, 'url': "{% url 'pybo:register' %}"}
+    return render(request, 'pybo/question_form.html', context)
 
+
+@login_required(login_url='common:login')
+def modify_question(request, question_id):
+    logging.info("request.method: {}".format(request.method))
+    context = None
+    question = get_object_or_404(Question, id=question_id)
+    if request.user.username != question.author.username:
+        messages.error(request, '수정 권한이 없습니다.')
+        return redirect('pybo:detail', question_id=question_id)
+
+    if request.method == "POST":
+        form = QuestionForm(request.POST, instance=question)
+        if form.is_valid():
+            question = form.save(commit=False)
+            question.modify_date = timezone.now()
+
+            question.save()
+            return redirect('pybo:detail', question_id=question_id)
+    else:
+        form = QuestionForm(instance=question)
+        context = {'form': form, 'url': ""}
+    return render(request, 'pybo/question_form.html', context)
+
+@login_required(login_url='common:login')
+def delete_question(request, question_id):
+    logging.info("request.method: {}".format(request.method))
+    question = get_object_or_404(Question, pk=question_id)
+
+    if request.user.username != question.author.username:
+        messages.error(request, '삭제 권한이 없습니다.')
+        return redirect('pybo:detail', question_id=question_id)
+
+    question.delete()
+    return redirect('index')
 
 # def question_create(request):
 #     question = Question(subject=request.POST.get("subject"),
@@ -67,7 +146,7 @@ def detail(request, question_id):
     # question = Question.objects.get(id=question_id)
     question = get_object_or_404(Question, pk=question_id)
 
-    context = {'question': question}
+    context = {'question': question, 'user': request.user}
     return render(request, "pybo/question_detail.html", context)
 
 

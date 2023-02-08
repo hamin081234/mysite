@@ -26,7 +26,7 @@ q.subject = 'Django Model은 무엇인가요?'
 q.save()
 
 q = Question.objects.get(id=1)
-a = Answer(question=q, content='id는 자동생성 됩니다.', create_date=timezone.now())
+a = Answer(question=q, content='id는 자동 생성 됩니다.', create_date=timezone.now())
 a.save()
 
 a = Answer.objects.get(id=1)
