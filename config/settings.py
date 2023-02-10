@@ -166,6 +166,11 @@ LOGGING = {
     },
     'loggers': {
         # 종류
+        'django.db.backend': {
+            'handlers': ['file', 'console'],
+            'propagate': False,
+            'level': 'DEBUG',
+        },
         'django.server': {
             'handlers': ['file', 'console'],
             'propagate': False,

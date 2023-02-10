@@ -13,6 +13,7 @@
     <option name="namespacePackageFolders">
       <list>
         <option value="$MODULE_DIR$/pybo/templatetags" />
+        <option value="$MODULE_DIR$/pybo/views" />
       </list>
     </option>
   </component>

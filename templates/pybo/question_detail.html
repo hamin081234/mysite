@@ -1,4 +1,5 @@
 {% extends "../base.html" %}
+{% load pybo_filter %}
 {% block content %}
 <main class="container">
     {% if question %}
@@ -19,18 +20,22 @@
     <p>{{question.create_date|date:"Y년 m월 d일"}}</p>
     <div> 내용 :
         <p>
-            {{question.content}}
+            {{question.content|mark}}
         </p>
     </div>
     <!-- 질문 수정 -->
-    {% if request.user != None and question.author == request.user %}
     <div class="my-3">
+        <a href="javascript:void(0);" class="recommend btn btn-outline-success"
+           data-url="{% url 'pybo:question_vote' question.id %}">
+            좋아요<span class="badge rounded-pill bg-success">{{question.voter.count}}</span>
+        </a>
+        {% if request.user != None and question.author == request.user %}
         <a href="{% url 'pybo:question_modify' question.id %}" class="modify btn btn-outline-primary">수정</a>
         <a href="{% url 'pybo:question_delete' question.id %}" class="delete btn btn-outline-danger">삭제</a>
-<!--        <a href="javascript:void(0);" data-url="{% url 'pybo:question_delete' question.id %}"  -->
-<!--           class="delete btn btn-outline-danger">삭제</a>-->
+        <!--        <a href="javascript:void(0);" data-url="{% url 'pybo:question_delete' question.id %}"  -->
+        <!--           class="delete btn btn-outline-danger">삭제</a>-->
+        {% endif %}
     </div>
-    {% endif %}
 
     <form name="answer" action="{% url 'pybo:answer_create' question.id %}" method="post" class="form-control">
         {% csrf_token %}
@@ -38,7 +43,8 @@
         {% include "form_errors.html" %}
         <!-- form validation 기능 end -->
 
-        <textarea name="content" id="content" rows="5" class="form-control">{{ form.content.value|default_if_none:'' }}</textarea>
+        <textarea name="content" id="content" rows="5"
+                  class="form-control">{{ form.content.value|default_if_none:'' }}</textarea>
         <input type="submit" value="답변등록" name="submit_answer" class="form-control">
     </form>
     <h3>답변: {{question.answer_set.count}}</h3>
@@ -46,10 +52,16 @@
         <ul>
             {% for answer in question.answer_set.all %}
             <li>
+                <!-- answer_+answer.id -->
+                <a id="answer_{{answer.id}}"></a>
                 <strong>{{answer.author.username}}</strong>  <!-- 글쓴이 -->
                 <p>
                     {{answer.content}}
                 </p>
+                <a href="javascript:void(0);" class="recommend btn btn-outline-success"
+                   data-url="{% url 'pybo:answer_vote' answer.id %}">
+                    좋아요<span class="badge rounded-pill bg-success">{{answer.voter.count}}</span>
+                </a>
                 {% if request.user != None and answer.author == request.user %}
                 <a href="{% url 'pybo:answer_modify' answer.id %}" class="btn btn-outline-primary">수정</a>
                 <a href="{% url 'pybo:answer_delete' answer.id %}" class="btn btn-outline-danger">삭제</a>
@@ -62,17 +74,36 @@
     <p> 데이터가 소실 되었습니다 </p>
     {% endif %}
 </main>
-{% endblock %}
-{% block script %}
 <script>
     const deleteBtn = document.querySelector(".delete")
-    deleteBtn.addEventListener('click', function(e){
-        if(confirm('삭제 하시겠습니까?')){
-            console.log("delete")
-            location.href = this.dataset["url"]
-        } else {
-            e.preventDefault()
-        }
+    console.log("delete bebefore")
+
+    if(deleteBtn != null){
+        deleteBtn.addEventListener('click', function(e){
+            if(confirm('삭제 하시겠습니까?')){
+                console.log("delete")
+                location.href = this.dataset["url"]
+            } else {
+                e.preventDefault()
+            }
+        });
+    }
+
+    const voteBtns = document.querySelectorAll(".recommend");
+    console.log("vote bebefore")
+
+    voteBtns.forEach(voteBtn => {
+        voteBtn.addEventListener('click', function(e){
+            console.log("vote before")
+            if(confirm('투표 하시겠습니까?')){
+                console.log("vote");
+                location.href = this.dataset["url"];
+
+            } else {
+                e.preventDefault()
+            }
+        });
     });
+
 </script>
 {% endblock %}

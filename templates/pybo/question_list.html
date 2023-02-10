@@ -11,31 +11,33 @@
 
     <!-- 검색, 버튼 -->
     <div class="d-grid gap-2 d-md-flex justify-content-end mb-3">
-        <form action="#" class="text-end input-group">
-            <div class="col-sm-2 col-md-2 col-lg-2">
-                <select class="form-select" aria-label="Default select example">
-                    <option selected>전체</option>
-                    <option value="10">제목</option>
-                    <option value="20">내용</option>
-                    <option value="30">작성자</option>
-                </select>
-            </div>
-            <div class="col-sm-6 col-md-6 col-lg-6">
-                <input type="text" class="form-control flex-2" placeholder="검색어 입력...">
-            </div>
-            <div class="col-sm-2 col-md-2 col-lg-2">
-                <select class="form-select flex-1" aria-label="Default select example">
-                    <option selected>전체</option>
-                    <option value="10">10</option>
-                    <option value="20">20</option>
-                    <option value="30">30</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                </select>
-            </div>
-        </form>
+        <div class="select-search">
+            <select name="search-type" id="search-type">
+                <option value="subject"
+                        {% if type == "subject" %} selected {% endif %}>제목</option>
+                <option value="content"
+                        {% if type == "content" %} selected {% endif %}>내용</option>
+                <option value="author"
+                        {% if type == "author" %} selected {% endif %}>작성자</option>
+            </select>
+        </div>
+        <div class="select-rows">
+            <select name="rows-num" id="rows-num">
+                <option value="10"
+                        {% if rows == 10 %} selected {% endif %}>10줄</option>
+                <option value="20"
+                        {% if rows == 20 %} selected {% endif %}>20줄</option>
+                <option value="30"
+                        {% if rows == 30 %} selected {% endif %}>30줄</option>
+            </select>
+        </div>
+        <div class="text-end my-1">
+            <input type="text" name="search_kw" id="search_kw" value="{{ kw | default_if_none:'' }}"
+                   class="form-control-sm">
+        </div>
+
         <div class="col-sm-1 col-md-1 col-lg-1">
-            <input type="button" class="btn btn-outline-secondary btn-sm" value="조회">
+            <input type="button" class="btn btn-outline-secondary btn-sm" value="조회" id="btn_search">
             <a href="{% url 'pybo:register' %}" class="btn btn-outline-primary btn-sm">등록</a>
         </div>
     </div>
@@ -48,13 +50,16 @@
             <th scope="col" class="text-center">작성일</th>
             <th scope="col" class="text-center">조회수</th>
             <th scope="col" class="text-center">작성자</th>
+            <th scope="col" class="text-center">좋아요</th>
         </tr>
         </thead>
         <tbody>
         {% if question_list %}
         {% for question in question_list %}
         <tr>
-            <td scope="col" class="text-center">{{question_list.paginator.count|sub:question_list.start_index|sub:forloop.counter0|add:1}}</td>
+            <td scope="col" class="text-center">
+                {{question_list.paginator.count|sub:question_list.start_index|sub:forloop.counter0|add:1}}
+            </td>
             <td scope="col" class="text-start">
                 <a href="{% url 'pybo:detail' question.id %}">
                     {{question.subject}}
@@ -64,8 +69,9 @@
                 {% endif %}
             </td>
             <td scope="col" class="text-center">{{question.create_date|date:"Y-m-d"}}</td>
-            <td scope="col" class="text-end">question.views</td>
+            <td scope="col" class="text-end">{{question.views}}</td>
             <td scope="col" class="text-end">{{question.author}}</td>
+            <td scope="col" class="text-end">{{question.voter.count}}</td>
         </tr>
         {% endfor %}
         {% else %}
@@ -75,54 +81,113 @@
         {% endif %}
         </tbody>
     </table>
+    <!-- table end -->
+    <!-- paging -->
+
+    <!--페이징 처리 --------------------------- -->
+    <ul class="pagination justify-content-center">
+        <!--이전 페이지-->
+        {% if question_list.has_previous %}
+        <li class="page-item">
+            <!--?page={{question_list.previous_page_number}}-->
+            <a class="page-link" href="javascript:void(0);"
+               data-page="{{question_list.previous_page_number}}">&laquo;</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <a class="page-link" href="javascript:void(0);" aria-disabled="true">&laquo;</a>
+        </li>
+        {% endif %}
+        <!--이전 페이지 end-->
+
+        <!--페이지 리스트-->
+        {% for page_number in question_list.paginator.page_range %}
+        <!--현재 선택 페이지와 나머지-->
+        <!-- 페이지 번호가 현재 페이지 기준으로 좌우 5개씩 보이도록 처리-->
+        {% if page_number >= question_list.number|add:-5 and page_number <= question_list.number|add:5%}
+        {% if page_number == question_list.number %}
+        <li class="page-item active" aria-current="page">
+            <a class="page-link" data-page="{{page_number}}"
+               href="javascript:void(0);">{{page_number}}</a>
+        </li>
+        {% else %}
+        <li class="page-item" aria-current="page">
+            <a class="page-link" data-page="{{page_number}}"
+               href="javascript:void(0);">{{page_number}}</a>
+        </li>
+        {% endif %}
+        {% endif %}
+        {% endfor %}
+        <!--페이지 리스트 end-->
+        {% if question_list.has_next %}
+        <li class="page-item">
+            <!--?page={{question_list.next_page_number}}-->
+            <a class="page-link" data-page="{{question_list.next_page_number}}"
+               href="javascript:void(0);">&raquo;</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <a class="page-link" href="javascript:void(0);" aria-disabled="true" tabindex="-1">&raquo;</a>
+        </li>
+        {% endif %}
+        <!--다음 페이지-->
+    </ul>
 </main>
-<!-- table end -->
-<!-- paging -->
-
-<!--페이징 처리 --------------------------- -->
-<ul class="pagination justify-content-center">
-    <!--이전 페이지-->
-    {% if question_list.has_previous %}
-    <li class="page-item">
-        <a class="page-link" href="?page={{question_list.previous_page_number}}">&laquo;</a>
-    </li>
-    {% else %}
-    <li class="page-item disabled">
-        <a class="page-link" href="#" aria-disabled="true">&laquo;</a>
-    </li>
-    {% endif %}
-    <!--이전 페이지 end-->
-
-    <!--페이지 리스트-->
-    {% for page_number in question_list.paginator.page_range %}
-    <!--현재 선택 페이지와 나머지-->
-    <!-- 페이지 번호가 현재 페이지 기준으로 좌우 5개씩 보이도록 처리-->
-    {% if page_number >= question_list.number|add:-5 and page_number <= question_list.number|add:5%}
-    {% if page_number == question_list.number %}
-    <li class="page-item active" aria-current="page">
-        <a class="page-link" href="?page=#">{{page_number}}</a>
-    </li>
-    {% else %}
-    <li class="page-item" aria-current="page">
-        <a class="page-link" href="?page={{page_number}}">{{page_number}}</a>
-    </li>
-    {% endif %}
-    {% endif %}
-    {% endfor %}
-    <!--페이지 리스트 end-->
-    {% if question_list.has_next %}
-    <li class="page-item">
-        <a class="page-link" href="?page={{question_list.next_page_number}}">&raquo;</a>
-    </li>
-    {% else %}
-    <li class="page-item disabled">
-        <a class="page-link" href="#" aria-disabled="true" tabindex="-1">&raquo;</a>
-    </li>
-    {% endif %}
-    <!--다음 페이지-->
-</ul>
+<form action="{% url 'index' %}" method="get" id="searchForm">
+    <input type="hidden" name="kw" id="kw" value="{{ kw | default_if_none:''}}">
+    <input type="hidden" name="page" id="page" value="{{ page }}">
+    <input type="hidden" name="type" id="type" value="{{ type | default_if_none:'subject' }}">
+    <input type="hidden" name="rows" id="rows" value="{{ rows | default_if_none:10 }}">
+</form>
 <!--페이지 처리 end --------------------------- -->
 
-<!-- paging end -->
-<!-- container end-->
 {% endblock %}
+
+<!-- javascript -->
+{% block script %}
+<script>
+
+    const page_links = document.getElementsByClassName("page-link");
+    console.log(page_links);
+
+    //btn-search : 검색어, page를 searchForm에 할당
+    const btn_search = document.getElementById("btn_search");
+    const search_kw = document.getElementById("search_kw");
+    const kw = document.getElementById("kw");
+    const page = document.getElementById("page");
+    const searchType = document.getElementById("search-type");
+    const type = document.getElementById("type");
+    const search_form = document.forms["searchForm"];
+    const rowsNum = document.getElementById("rows-num");
+    const rows = document.getElementById("rows");
+
+    function search(){
+        kw.value = search_kw.value;
+        page.value = 1;
+        type.value = searchType.value;
+        rows.value = rowsNum.value;
+        search_form.submit();
+    };
+
+    search_kw.addEventListener('enter', ()=>{
+        if (e.key === 'Enter') {
+            search();
+        }
+    });
+
+    Array.from(page_links).forEach(function(element){
+        element.addEventListener('click', function(e){
+            //console.log('page-link class');
+            //console.log('this.dataset.page: '+this.dataset.page);
+            kw.value = search_kw.value;
+            page.value = this.dataset.page;
+            rows.value = rowsNum.value;
+            search_form.submit();
+        });
+    });
+
+    btn_search.addEventListener('click', search);
+
+</script>
+{% endblock %}
+<!-- javascript END -->
